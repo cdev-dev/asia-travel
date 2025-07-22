@@ -3,12 +3,16 @@ class Destino {
   final String nombre;
   final String descripcion;
   final String imagenUrl;
+  final double precio;
+  final int dias;
 
   Destino({
     required this.id,
     required this.nombre,
     required this.descripcion,
     required this.imagenUrl,
+    required this.precio,
+    required this.dias,
   });
 
   factory Destino.fromJson(Map<String, dynamic> json) {
@@ -21,6 +25,8 @@ class Destino {
       nombre: json['nombre'],
       descripcion: json['descripcion'],
       imagenUrl: urlImagen,
+      precio: json['precio']?.toDouble() ?? 0.0, // Asegura que sea double
+      dias: json['dias'] ?? 0, // Asegura que no falle si falta
     );
   }
 }

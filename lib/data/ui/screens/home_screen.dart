@@ -31,13 +31,19 @@ class _HomeScreenState extends State<HomeScreen> {
     if (response.statusCode == 200) {
       final List<dynamic> jsonList = json.decode(response.body);
 
+      print('Respuesta JSON: $jsonList'); // 👈 Imprime el contenido recibido
+
       setState(() {
         destinos = jsonList
             .map((jsonItem) => Destino.fromJson(jsonItem))
             .toList();
       });
+
+      print(
+        'Destinos cargados: ${destinos.length}',
+      ); // 👈 Verifica que hay datos
     } else {
-      print('Error al cargar los datos');
+      print('Error al cargar los datos: ${response.statusCode}');
     }
   }
 
@@ -62,23 +68,30 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          Expanded(
-            child: destinos.isEmpty
-                ? const Center(child: CircularProgressIndicator())
-                : ListView.builder(
-                    scrollDirection: Axis.horizontal, // horizontal
+          const SizedBox(height: 6),
+          destinos.isEmpty
+              ? const Center(child: CircularProgressIndicator())
+              : SizedBox(
+                  height:
+                      240, // altura para que el ListView horizontal tenga un tamaño definido
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
                     itemCount: destinos.length,
                     itemBuilder: (context, index) {
                       final destino = destinos[index];
-                      return TripCard(
-                        title: destino.nombre,
-                        imageUrl: destino.imagenUrl,
-                        duration: '10 días',
-                        price: '1.499€',
+                      return SizedBox(
+                        width: 350, // ANCHO FIJO para cada tarjeta
+                        child: TripCard(
+                          title: destino.nombre,
+                          imageUrl: destino.imagenUrl,
+                          duration: '${destino.dias} días',
+                          price: '${destino.precio.toStringAsFixed(2)} €',
+                          onTap: () {},
+                        ),
                       );
                     },
                   ),
-          ),
+                ),
         ],
       ),
     );
