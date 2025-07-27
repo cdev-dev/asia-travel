@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-import '../widgets/cards/trip_card.dart';
-import '../widgets/header/custom_header.dart';
-import 'package:asia_travel/data/models/destino_model.dart';
+import '../../../ui/routes/app_routes.dart';
+import '../../widgets/cards/trip_card.dart';
+import '../../widgets/header/custom_header.dart';
+import '../../../data/models/destino_model.dart';
+import 'home_viewmodel.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,36 +13,23 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final HomeViewModel _viewModel = HomeViewModel();
   List<Destino> destinos = [];
 
   @override
   void initState() {
     super.initState();
-    cargarDestino();
+    _loadDestinos();
   }
 
-  Future<void> cargarDestino() async {
-    final url = Uri.parse(
-      'https://cdev-dev.github.io/asia-travel-assets/data/destinos.json',
-    );
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonList = json.decode(response.body);
-
-      print('Respuesta JSON: $jsonList'); // 👈 Imprime el contenido recibido
-
+  Future<void> _loadDestinos() async {
+    try {
+      final data = await _viewModel.cargarDestinos();
       setState(() {
-        destinos = jsonList
-            .map((jsonItem) => Destino.fromJson(jsonItem))
-            .toList();
+        destinos = data;
       });
-
-      print(
-        'Destinos cargados: ${destinos.length}',
-      ); // 👈 Verifica que hay datos
-    } else {
-      print('Error al cargar los datos: ${response.statusCode}');
+    } catch (e) {
+      print('Error al cargar destinos: $e');
     }
   }
 
@@ -72,21 +58,22 @@ class _HomeScreenState extends State<HomeScreen> {
           destinos.isEmpty
               ? const Center(child: CircularProgressIndicator())
               : SizedBox(
-                  height:
-                      240, // altura para que el ListView horizontal tenga un tamaño definido
+                  height: 240,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: destinos.length,
                     itemBuilder: (context, index) {
                       final destino = destinos[index];
                       return SizedBox(
-                        width: 350, // ANCHO FIJO para cada tarjeta
+                        width: 350,
                         child: TripCard(
                           title: destino.nombre,
                           imageUrl: destino.imagenUrl,
                           duration: '${destino.dias} días',
                           price: '${destino.precio.toStringAsFixed(2)} €',
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.of(context).pushNamed(AppRoutes.destino);
+                          },
                         ),
                       );
                     },

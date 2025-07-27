@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'data/ui/screens/home_screen.dart';
+import 'ui/routes/app_routes.dart';
 import 'package:flutter/services.dart';
 
 void main() {
@@ -7,11 +7,11 @@ void main() {
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      statusBarColor: Colors.red, // aquí defines el color de la barra de estado
-      statusBarIconBrightness:
-          Brightness.dark, // iconos oscuros para que se vean sobre blanco
+      statusBarColor: Colors.red,
+      statusBarIconBrightness: Brightness.dark,
     ),
   );
+
   runApp(const MyApp());
 }
 
@@ -23,7 +23,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Asia Travel',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const HomeScreen(),
+      initialRoute: AppRoutes.home,
+      routes: AppRoutes.routes,
       debugShowCheckedModeBanner: false,
     );
   }
