@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../ui/routes/app_routes.dart';
-import '../../widgets/cards/trip_card.dart';
-import '../../widgets/header/custom_header.dart';
-import '../../../data/models/destino_model.dart';
-import 'home_viewmodel.dart';
+
+import 'package:asia_travel/data/models/destino_model.dart';
+import 'package:asia_travel/ui/widgets/cards/trip_card.dart';
+import 'package:asia_travel/ui/widgets/header/custom_header.dart';
+import 'package:asia_travel/ui/routes/app_routes.dart';
+import 'package:asia_travel/ui/screens/home/home_viewmodel.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -72,7 +73,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           duration: '${destino.dias} días',
                           price: '${destino.precio.toStringAsFixed(2)} €',
                           onTap: () {
-                            Navigator.of(context).pushNamed(AppRoutes.destino);
+                            Navigator.of(context).pushNamed(
+                              AppRoutes.destino,
+                              arguments: destino.id, // 👈 Pasamos el ID
+                            );
                           },
                         ),
                       );

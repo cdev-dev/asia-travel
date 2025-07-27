@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../models/destino_model.dart';
+
+import 'package:asia_travel/data/models/destino_model.dart';
 
 class DestinoService {
   Future<List<Destino>> fetchDestinos() async {

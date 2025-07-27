@@ -56,7 +56,7 @@ class TripCard extends StatelessWidget {
                       children: [
                         Text('Duración: $duration'),
                         const SizedBox(width: 50),
-                        Text('Precio: $price'),
+                        Text('Desde: $price'),
                       ],
                     ),
                   ],

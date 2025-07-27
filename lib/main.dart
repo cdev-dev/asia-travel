@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'ui/routes/app_routes.dart';
 import 'package:flutter/services.dart';
+
+import 'package:asia_travel/ui/routes/app_routes.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

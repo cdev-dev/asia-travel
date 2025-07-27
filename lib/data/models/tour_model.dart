@@ -1,32 +1,36 @@
 class Tour {
   final int id;
-  final String nombre;
-  final String descripcion;
+  final int destinoId;
+  final String titulo;
+  final String descripcionCorta;
   final String imagenUrl;
   final double precio;
-  final int dias;
+  final String duracion;
 
   Tour({
     required this.id,
-    required this.nombre,
-    required this.descripcion,
+    required this.destinoId,
+    required this.titulo,
+    required this.descripcionCorta,
     required this.imagenUrl,
     required this.precio,
-    required this.dias,
+    required this.duracion,
   });
 
   factory Tour.fromJson(Map<String, dynamic> json) {
-    final String rutaImagen = json['imagen_destacada'];
+    final String rutaImagen = json['imagen_destacada'] ?? '';
+    final String imagenFinal = rutaImagen.replaceFirst('assets/images/', '');
     final String urlImagen =
-        'https://cdev-dev.github.io/asia-travel-assets/${rutaImagen.replaceFirst('assets/', '')}';
+        'https://cdev-dev.github.io/asia-travel-assets/images/destinos/$imagenFinal';
 
     return Tour(
-      id: json['id'],
-      nombre: json['nombre'],
-      descripcion: json['descripcion'],
+      id: json['id'] ?? 0,
+      destinoId: json['destino_id'] ?? 0,
+      titulo: json['titulo'] ?? '',
+      descripcionCorta: json['descripcion_corta'] ?? '',
       imagenUrl: urlImagen,
-      precio: json['precio']?.toDouble() ?? 0.0, // Asegura que sea double
-      dias: json['dias'] ?? 0, // Asegura que no falle si falta
+      precio: (json['precio'] as num?)?.toDouble() ?? 0.0,
+      duracion: json['duracion'] ?? '',
     );
   }
 }
