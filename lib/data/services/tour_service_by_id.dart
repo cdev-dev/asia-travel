@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:asia_travel/data/models/tour_model.dart';
 
-class TourService {
+class TourServiceById {
   Future<List<Tour>> fetchToursByDestinoId(int destinoId) async {
     final url = Uri.parse(
       'https://cdev-dev.github.io/asia-travel-assets/data/tours.json',

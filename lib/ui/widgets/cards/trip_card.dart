@@ -5,6 +5,9 @@ class TripCard extends StatelessWidget {
   final String imageUrl;
   final String duration;
   final String price;
+  final String durationLabel;
+  final String priceLabel;
+  final double spacing; // <-- nuevo parámetro para controlar el espacio
   final VoidCallback? onTap;
 
   const TripCard({
@@ -13,6 +16,9 @@ class TripCard extends StatelessWidget {
     required this.imageUrl,
     required this.duration,
     required this.price,
+    this.durationLabel = 'Duración:',
+    this.priceLabel = 'Desde:',
+    this.spacing = 80, // valor por defecto igual que antes
     this.onTap,
   });
 
@@ -34,7 +40,16 @@ class TripCard extends StatelessWidget {
                 width: double.infinity,
                 height: 150,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: double.infinity,
+                    height: 150,
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.broken_image, size: 40),
+                  );
+                },
               ),
+
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16.0,
@@ -54,9 +69,9 @@ class TripCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Text('Duración: $duration'),
-                        const SizedBox(width: 50),
-                        Text('Desde: $price'),
+                        Text('$durationLabel $duration'),
+                        SizedBox(width: spacing), // aquí usamos el parámetro
+                        Text('$priceLabel $price'),
                       ],
                     ),
                   ],
