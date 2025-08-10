@@ -1,16 +1,20 @@
 // #region Imports
+import 'package:asia_travel/ui/screens/destino/destino_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'dart:developer' as developer;
+
+import 'package:asia_travel/data/models/contenido_inicio_model.dart';
+import 'package:asia_travel/data/models/destino_model.dart';
+import 'package:asia_travel/data/models/tour_model.dart';
 
 import 'package:asia_travel/ui/widgets/animations/slide_transition_card.dart';
 import 'package:asia_travel/ui/widgets/destino/destino_descripcion.dart';
 import 'package:asia_travel/ui/widgets/cards/trip_card.dart';
 
-import 'package:asia_travel/data/models/destino_model.dart';
 import 'package:asia_travel/data/services/destino_service.dart';
 import 'package:asia_travel/data/services/tour_service_by_id.dart';
-import 'package:asia_travel/data/models/tour_model.dart';
+
 // #endregion
 
 class DestinoScreen extends StatefulWidget {
@@ -22,14 +26,17 @@ class DestinoScreen extends StatefulWidget {
 
 class _DestinoScreenState extends State<DestinoScreen>
     with SingleTickerProviderStateMixin {
+  final DestinoViewModel _viewModel = DestinoViewModel();
   Destino? destino;
   List<Tour> tours = [];
   bool isLoadingDestino = true;
   bool isLoadingTours = true;
 
+  ContenidoInicio? contenidoInicio; // Contenido de inicio
+
   int? destinoId;
 
-  // Control para animación del título
+  // Animación título
   bool _tituloVisible = false;
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
@@ -37,13 +44,11 @@ class _DestinoScreenState extends State<DestinoScreen>
   @override
   void initState() {
     super.initState();
-
-    // Configura el controlador y la animación para el título
+    _loadContenidoInicio();
     _controller = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-
     _scaleAnimation = Tween<double>(
       begin: 0.8,
       end: 1.0,
@@ -53,12 +58,10 @@ class _DestinoScreenState extends State<DestinoScreen>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    // Obtiene el ID del destino de los argumentos de la ruta
-    destinoId ??= ModalRoute.of(context)!.settings.arguments as int;
-
-    // Carga destino y luego tours
-    _loadDestino().then((_) => _loadTours());
+    if (destinoId == null) {
+      destinoId = ModalRoute.of(context)!.settings.arguments as int;
+      _loadDestino().then((_) => _loadTours());
+    }
   }
 
   @override
@@ -67,7 +70,6 @@ class _DestinoScreenState extends State<DestinoScreen>
     super.dispose();
   }
 
-  // Carga los datos del destino desde el servicio
   Future<void> _loadDestino() async {
     try {
       final destinos = await DestinoService().fetchDestinos();
@@ -75,38 +77,49 @@ class _DestinoScreenState extends State<DestinoScreen>
         (d) => d.id == destinoId,
         orElse: () => throw Exception('Destino no encontrado'),
       );
+      if (!mounted) return;
       setState(() {
         destino = destinoEncontrado;
         isLoadingDestino = false;
       });
     } catch (e) {
-      // Manejo de error si quieres
-      setState(() {
-        isLoadingDestino = false;
-      });
+      if (!mounted) return;
+      setState(() => isLoadingDestino = false);
       debugPrint('Error cargando destino: $e');
     }
   }
 
-  // Carga los tours asociados al destino
   Future<void> _loadTours() async {
     try {
       final toursData = await TourServiceById().fetchToursByDestinoId(
         destinoId!,
       );
+      if (!mounted) return;
       setState(() {
         tours = toursData;
         isLoadingTours = false;
       });
     } catch (e) {
-      setState(() {
-        isLoadingTours = false;
-      });
+      if (!mounted) return;
+      setState(() => isLoadingTours = false);
       debugPrint('Error cargando tours: $e');
     }
   }
 
-  // Construye el encabezado con imagen y título del destino
+  /// Carga contenido de inicio desde el ViewModel y actualiza el estado
+  Future<void> _loadContenidoInicio() async {
+    try {
+      final contenido = await _viewModel.cargarContenidoInicio();
+      if (!mounted) return;
+      setState(() {
+        contenidoInicio = contenido;
+      });
+    } catch (e) {
+      // ignore: avoid_print
+      developer.log('Error al cargar contenido inicio: $e');
+    }
+  }
+
   Widget _buildSliverAppBar() {
     return SliverAppBar(
       expandedHeight: 250,
@@ -118,7 +131,7 @@ class _DestinoScreenState extends State<DestinoScreen>
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               blurRadius: 8,
               offset: const Offset(0, 3),
             ),
@@ -139,7 +152,6 @@ class _DestinoScreenState extends State<DestinoScreen>
     );
   }
 
-  // Construye la descripción larga del destino
   Widget _buildDescripcion() {
     return SliverToBoxAdapter(
       child: Padding(
@@ -149,29 +161,22 @@ class _DestinoScreenState extends State<DestinoScreen>
     );
   }
 
-  // Construye el título animado "Nuestros viajes a {nombre}"
+  // Widget para mostrar el título animado y NUestros viajes a...
   Widget _buildAnimatedTitulo() {
     return SliverToBoxAdapter(
       child: VisibilityDetector(
         key: const Key('titulo-viajes'),
         onVisibilityChanged: (info) {
-          if (!mounted) {
-            return; // Evita hacer nada si el widget ya no está montado
-          }
-
+          if (!mounted) return;
           if (info.visibleFraction > 0.3 && !_tituloVisible) {
-            setState(() {
-              _tituloVisible = true;
-            });
-            _controller.forward(from: 0.0); // inicia la animación
+            setState(() => _tituloVisible = true);
+            _controller.forward(from: 0.0);
           } else if (info.visibleFraction == 0 && _tituloVisible) {
-            setState(() {
-              _tituloVisible = false;
-            });
-            _controller.reset(); // resetea la animación para la próxima vez
+            setState(() => _tituloVisible = false);
+            _controller.reset();
+            _controller.stop();
           }
         },
-
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: ScaleTransition(
@@ -194,20 +199,19 @@ class _DestinoScreenState extends State<DestinoScreen>
     );
   }
 
-  // Construye la lista de tours, con animación de entrada para cada tarjeta
+  // Widget para mostrar la lista de tours
   Widget _buildToursList() {
     if (isLoadingTours) {
       return const SliverToBoxAdapter(
         child: Center(child: CircularProgressIndicator()),
       );
     }
-
     return SliverList(
       delegate: SliverChildBuilderDelegate((context, index) {
         final tour = tours[index];
         return SlideTransitionCard(
-          delay: Duration(milliseconds: index * 150), // retraso incremental
-          duration: const Duration(milliseconds: 3000), //velocidad de animación
+          delay: Duration(milliseconds: index * 150),
+          duration: const Duration(milliseconds: 3000),
           child: TripCard(
             title: tour.titulo,
             imageUrl: tour.imagenUrl,
@@ -215,9 +219,16 @@ class _DestinoScreenState extends State<DestinoScreen>
             price: '${tour.precio.toStringAsFixed(0)}€',
             durationLabel: 'Duración:',
             priceLabel: 'Precio:',
-            spacing: 150, // espacio entre textos modificado
+            spacing: 150,
             onTap: () {
-              developer.log('Navegando a detalle del tour: ${tour.titulo}');
+              developer.log(
+                'Navegando a detalle del tour: ${tour.titulo} con id ${tour.id}',
+              );
+              Navigator.pushNamed(
+                context,
+                '/tour',
+                arguments: tour.id, // Pasamos el id del tour
+              );
             },
           ),
         );
@@ -225,13 +236,66 @@ class _DestinoScreenState extends State<DestinoScreen>
     );
   }
 
+  //Widget para mostrar los servicios
+  Widget _buildServicios() {
+    return SliverToBoxAdapter(
+      child: Container(
+        width: double.infinity,
+        color: Colors.grey[200],
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+              child: Text(
+                'Servicios',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 10),
+            ...(contenidoInicio?.servicios ?? []).map((servicio) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.network(
+                      servicio.imagen,
+                      height: 80,
+                      width: 80,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(Icons.broken_image, size: 30);
+                      },
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        servicio.descripcion,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Mientras carga destino mostramos loader
-    if (isLoadingDestino || destino == null) {
+    if (isLoadingDestino) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    } else if (destino == null) {
+      return Scaffold(body: Center(child: Text('Error al cargar destino')));
     }
-
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -239,6 +303,7 @@ class _DestinoScreenState extends State<DestinoScreen>
           _buildDescripcion(),
           _buildAnimatedTitulo(),
           _buildToursList(),
+          _buildServicios(),
         ],
       ),
     );

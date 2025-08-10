@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 class DestinoDescripcion extends StatelessWidget {
   final String descripcionLarga;
+  final bool usarHtml; // Nuevo parámetro para elegir el renderizado
 
-  const DestinoDescripcion({super.key, required this.descripcionLarga});
+  const DestinoDescripcion({
+    super.key,
+    required this.descripcionLarga,
+    this.usarHtml =
+        false, // Por defecto usa Markdown para mantener compatibilidad
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,40 +29,25 @@ class DestinoDescripcion extends StatelessWidget {
           ),
         ],
       ),
-      child: MarkdownBody(
-        data: descripcionLarga,
-        styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
-          p: const TextStyle(fontSize: 16, color: Colors.black87),
-          h1: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          h2: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          em: const TextStyle(fontStyle: FontStyle.italic),
-          strong: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-  }
-}
-
-class DestinoImage extends StatelessWidget {
-  final String imageUrl;
-
-  const DestinoImage({super.key, required this.imageUrl});
-
-  @override
-  Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 16 / 9, // 👈 Aquí defines la proporción deseada
-      child: Image.network(
-        imageUrl,
-        fit: BoxFit.cover, // 👈 Rellena el espacio sin deformar
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return const Center(child: CircularProgressIndicator());
-        },
-        errorBuilder: (context, error, stackTrace) {
-          return const Center(child: Icon(Icons.broken_image));
-        },
-      ),
+      child: usarHtml
+          ? Html(data: descripcionLarga)
+          : MarkdownBody(
+              data: descripcionLarga,
+              styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
+                  .copyWith(
+                    p: const TextStyle(fontSize: 16, color: Colors.black87),
+                    h1: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    h2: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    em: const TextStyle(fontStyle: FontStyle.italic),
+                    strong: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+            ),
     );
   }
 }

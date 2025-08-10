@@ -29,4 +29,33 @@ class TourServiceById {
       throw Exception('Error al cargar los tours');
     }
   }
+
+  Future<Tour> fetchTourById(int id) async {
+    final url = Uri.parse(
+      'https://cdev-dev.github.io/asia-travel-assets/data/tours.json',
+    );
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = json.decode(response.body);
+
+      for (var destino in jsonList) {
+        if (destino['tours'] != null) {
+          final toursJson = destino['tours'] as List<dynamic>;
+
+          final tourJson = toursJson.firstWhere(
+            (tour) => tour['id'] == id,
+            orElse: () => null,
+          );
+
+          if (tourJson != null) {
+            return Tour.fromJson(tourJson);
+          }
+        }
+      }
+      throw Exception('Tour con id $id no encontrado');
+    } else {
+      throw Exception('Error al cargar los tours');
+    }
+  }
 }
