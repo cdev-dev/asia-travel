@@ -2,12 +2,15 @@ class RutaViaje {
   final int dia;
   final String titulo;
   final String descripcion;
-  // Puedes añadir aquí más campos nuevos cuando los tengas
+  final double latitud;
+  final double longitud;
 
   RutaViaje({
     required this.dia,
     required this.titulo,
     required this.descripcion,
+    required this.latitud,
+    required this.longitud,
   });
 
   factory RutaViaje.fromJson(Map<String, dynamic> json) {
@@ -15,6 +18,8 @@ class RutaViaje {
       dia: json['dia'] ?? 0,
       titulo: json['titulo'] ?? '',
       descripcion: json['descripcion'] ?? '',
+      latitud: json['latitud']?.toDouble() ?? 0.0,
+      longitud: json['longitud']?.toDouble() ?? 0.0,
     );
   }
 }

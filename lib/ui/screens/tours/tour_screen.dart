@@ -8,7 +8,12 @@ import 'package:asia_travel/data/models/tour_model.dart';
 
 import 'package:asia_travel/ui/widgets/destino/destino_descripcion.dart';
 import 'package:asia_travel/ui/widgets/tour/ruta_viaje.dart';
+import 'package:asia_travel/ui/widgets/tour/tour_map_widget.dart';
+import 'package:asia_travel/ui/widgets/tour/datos_clave_tour.dart';
+import 'package:asia_travel/ui/widgets/tour/floating_action_buttons_widget.dart';
 
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 // #endregion
 
 class TourScreen extends StatefulWidget {
@@ -21,15 +26,22 @@ class TourScreen extends StatefulWidget {
 class _TourScreenState extends State<TourScreen>
     with SingleTickerProviderStateMixin {
   final TourViewModel _viewModel = TourViewModel();
+
   Tour? tour;
   int? tourId;
   List<Tour> tours = [];
   bool isLoadingDestino = true;
   bool isLoadingTours = true;
 
-  ContenidoInicio? contenidoInicio; // Contenido de inicio
+  ContenidoInicio? contenidoInicio;
 
   int? destinoId;
+
+  // Controlador del mapa para flutter_map
+  final MapController _mapController = MapController();
+
+  // Índice del destino seleccionado en la ruta
+  int? _selectedIndex;
 
   @override
   void initState() {
@@ -62,7 +74,6 @@ class _TourScreenState extends State<TourScreen>
     }
   }
 
-  // Carga contenido de inicio desde el ViewModel y actualiza el estado
   Future<void> _loadContenidoInicio() async {
     try {
       final contenido = await _viewModel.cargarContenidoInicio();
@@ -71,9 +82,18 @@ class _TourScreenState extends State<TourScreen>
         contenidoInicio = contenido;
       });
     } catch (e) {
-      // ignore: avoid_print
       developer.log('Error al cargar contenido inicio: $e');
     }
+  }
+
+  // Callback para manejar selección del día en la ruta
+  void _onDiaSelected(int index) {
+    setState(() {
+      _selectedIndex = index;
+      final dia = tour!.rutaViaje[index];
+      // Mueve el mapa al destino seleccionado con zoom 13
+      _mapController.move(LatLng(dia.latitud, dia.longitud), 13);
+    });
   }
 
   Widget _buildSliverAppBar() {
@@ -83,11 +103,11 @@ class _TourScreenState extends State<TourScreen>
       title: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.9),
+          color: Colors.white.withAlpha(230),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.white.withValues(alpha: 0.15),
+              color: Colors.white.withAlpha(38),
               blurRadius: 8,
               offset: const Offset(0, 3),
             ),
@@ -112,9 +132,19 @@ class _TourScreenState extends State<TourScreen>
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: DestinoDescripcion(
-          descripcionLarga: tour!.descripcionLarga,
-          usarHtml: true,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Datos clave del tour
+            DatosClaveTour(precio: tour!.precio, dias: tour!.duracion),
+
+            //Contrucción de la descripción del destino
+            const SizedBox(height: 12),
+            DestinoDescripcion(
+              descripcionLarga: tour!.descripcionLarga,
+              usarHtml: true,
+            ),
+          ],
         ),
       ),
     );
@@ -128,12 +158,40 @@ class _TourScreenState extends State<TourScreen>
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: RutaViajeWidget(rutaViaje: tour!.rutaViaje),
+        child: RutaViajeWidget(
+          rutaViaje: tour!.rutaViaje,
+          onDiaSelected: _onDiaSelected,
+          selectedIndex: _selectedIndex,
+        ),
       ),
     );
   }
 
-  //Widget para mostrar los servicios
+  Widget _buildMapa() {
+    if (tour == null || tour!.rutaViaje.isEmpty) {
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
+    return SliverToBoxAdapter(
+      child: TourMapWidget(
+        puntos: tour!.rutaViaje,
+        selectedIndex: _selectedIndex,
+        mapController: _mapController,
+        onMarkerTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+            _mapController.move(
+              LatLng(
+                tour!.rutaViaje[index].latitud,
+                tour!.rutaViaje[index].longitud,
+              ),
+              13,
+            );
+          });
+        },
+      ),
+    );
+  }
+
   Widget _buildServicios() {
     return SliverToBoxAdapter(
       child: Container(
@@ -193,13 +251,32 @@ class _TourScreenState extends State<TourScreen>
     } else if (tour == null) {
       return Scaffold(body: Center(child: Text('Error al cargar destino')));
     }
+
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          _buildSliverAppBar(),
-          _buildDescripcion(),
-          _buildRutaViaje(),
-          _buildServicios(),
+      extendBodyBehindAppBar: true, // si quieres que esté detrás del appbar
+      body: Stack(
+        children: [
+          CustomScrollView(
+            slivers: [
+              _buildSliverAppBar(),
+              _buildDescripcion(),
+              _buildRutaViaje(),
+              _buildMapa(),
+              _buildServicios(),
+            ],
+          ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 56 / 2 - 17,
+            right: 16,
+            child: FloatingActionButtonsWidget(
+              onSharePressed: () {
+                // Aquí pon la acción que quieras para compartir
+              },
+              onFavoritePressed: () {
+                // Aquí la acción para favorito
+              },
+            ),
+          ),
         ],
       ),
     );

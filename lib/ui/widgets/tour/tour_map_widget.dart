@@ -1,0 +1,79 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+
+class TourMapWidget extends StatelessWidget {
+  final List<dynamic>
+  puntos; // Aquí pon el tipo correcto, p.ej. List<RutaViaje>
+  final int? selectedIndex;
+  final MapController mapController;
+  final double height;
+  final Function(int index)? onMarkerTap;
+
+  const TourMapWidget({
+    super.key,
+    required this.puntos,
+    required this.mapController,
+    this.selectedIndex,
+    this.height = 250,
+    this.onMarkerTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final markers = puntos.asMap().entries.map((entry) {
+      final idx = entry.key;
+      final dia = entry.value;
+      final isSelected = selectedIndex != null && selectedIndex == idx;
+
+      return Marker(
+        point: LatLng(dia.latitud, dia.longitud),
+        width: 40,
+        height: 40,
+        builder: (_) => GestureDetector(
+          onTap: () => onMarkerTap?.call(idx),
+          child: Icon(
+            Icons.location_on,
+            color: isSelected ? Colors.red : Colors.blue,
+            size: isSelected ? 40 : 30,
+          ),
+        ),
+      );
+    }).toList();
+
+    return Container(
+      height: height,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(51), // 0.2 * 255 = 51
+            blurRadius: 8,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.hardEdge,
+      child: FlutterMap(
+        mapController: mapController,
+        options: MapOptions(
+          center: selectedIndex != null
+              ? LatLng(
+                  puntos[selectedIndex!].latitud,
+                  puntos[selectedIndex!].longitud,
+                )
+              : LatLng(puntos[0].latitud, puntos[0].longitud),
+          zoom: 5,
+        ),
+        children: [
+          TileLayer(
+            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            userAgentPackageName: 'com.example.asia_travel',
+          ),
+          MarkerLayer(markers: markers),
+        ],
+      ),
+    );
+  }
+}
