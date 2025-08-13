@@ -11,6 +11,8 @@ import 'package:asia_travel/data/models/tour_model.dart';
 import 'package:asia_travel/ui/widgets/animations/slide_transition_card.dart';
 import 'package:asia_travel/ui/widgets/destino/destino_descripcion.dart';
 import 'package:asia_travel/ui/widgets/cards/trip_card.dart';
+import 'package:asia_travel/ui/widgets/destino/viajes_a_medida_widget.dart';
+import 'package:asia_travel/ui/widgets/header/footer_widget.dart';
 
 import 'package:asia_travel/data/services/destino_service.dart';
 import 'package:asia_travel/data/services/tour_service_by_id.dart';
@@ -236,6 +238,11 @@ class _DestinoScreenState extends State<DestinoScreen>
     );
   }
 
+  // Construcción del widget Viajes a Medida
+  SliverToBoxAdapter _buildViajeAMedida() {
+    return SliverToBoxAdapter(child: ViajeAMedidaWidget());
+  }
+
   //Widget para mostrar los servicios
   Widget _buildServicios() {
     return SliverToBoxAdapter(
@@ -303,7 +310,10 @@ class _DestinoScreenState extends State<DestinoScreen>
           _buildDescripcion(),
           _buildAnimatedTitulo(),
           _buildToursList(),
+          _buildViajeAMedida(),
           _buildServicios(),
+
+          SliverToBoxAdapter(child: FooterWidget()),
         ],
       ),
     );

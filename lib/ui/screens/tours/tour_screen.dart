@@ -1,16 +1,22 @@
 // #region Imports
 import 'package:asia_travel/ui/screens/tours/tour_viewmodel.dart';
+import 'package:asia_travel/ui/widgets/buttons/simple_button.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 
 import 'package:asia_travel/data/models/contenido_inicio_model.dart';
 import 'package:asia_travel/data/models/tour_model.dart';
 
+import 'package:asia_travel/ui/routes/app_routes.dart';
+
 import 'package:asia_travel/ui/widgets/destino/destino_descripcion.dart';
 import 'package:asia_travel/ui/widgets/tour/ruta_viaje.dart';
 import 'package:asia_travel/ui/widgets/tour/tour_map_widget.dart';
 import 'package:asia_travel/ui/widgets/tour/datos_clave_tour.dart';
 import 'package:asia_travel/ui/widgets/tour/floating_action_buttons_widget.dart';
+import 'package:asia_travel/ui/widgets/tour/reserva_widget.dart';
+import 'package:asia_travel/ui/widgets/tour/contacto_widget.dart';
+import 'package:asia_travel/ui/widgets/header/footer_widget.dart';
 
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -192,6 +198,47 @@ class _TourScreenState extends State<TourScreen>
     );
   }
 
+  // Construcción del widget de reserva
+  SliverToBoxAdapter _buildReserva() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: ReservaWidget(
+          precio: tour!.precio,
+          duracionTexto: tour!.duracion, // le pasamos el string tal cual
+        ),
+      ),
+    );
+  }
+
+  // Construcción del widget de contacto
+  SliverToBoxAdapter _buildContactoDudas() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: const ContactoDudasWidget(),
+      ),
+    );
+  }
+
+  // Construcción del widget Botón volver al listado de viajes
+  SliverToBoxAdapter _buildVolverListadoViajes() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: SimpleButton(
+          text: 'Volver al listado de viajes',
+          onPressed: () {
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              AppRoutes.home,
+              (route) => false, // elimina todas las rutas anteriores
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   Widget _buildServicios() {
     return SliverToBoxAdapter(
       child: Container(
@@ -262,7 +309,12 @@ class _TourScreenState extends State<TourScreen>
               _buildDescripcion(),
               _buildRutaViaje(),
               _buildMapa(),
+              _buildReserva(),
+              _buildContactoDudas(),
+              _buildVolverListadoViajes(),
               _buildServicios(),
+
+              SliverToBoxAdapter(child: FooterWidget()),
             ],
           ),
           Positioned(

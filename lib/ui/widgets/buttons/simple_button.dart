@@ -10,7 +10,7 @@ class SimpleButton extends StatelessWidget {
     super.key,
     required this.text,
     required this.onPressed,
-    this.backgroundColor = Colors.blue,
+    this.backgroundColor = Colors.red,
     this.foregroundColor = Colors.white,
   });
 
@@ -22,9 +22,7 @@ class SimpleButton extends StatelessWidget {
         backgroundColor: backgroundColor,
         foregroundColor: foregroundColor,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         elevation: 6,
         textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),

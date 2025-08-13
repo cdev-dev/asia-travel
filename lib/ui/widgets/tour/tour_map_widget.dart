@@ -3,8 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 class TourMapWidget extends StatelessWidget {
-  final List<dynamic>
-  puntos; // Aquí pon el tipo correcto, p.ej. List<RutaViaje>
+  final List<dynamic> puntos;
   final int? selectedIndex;
   final MapController mapController;
   final double height;
@@ -30,7 +29,7 @@ class TourMapWidget extends StatelessWidget {
         point: LatLng(dia.latitud, dia.longitud),
         width: 40,
         height: 40,
-        builder: (_) => GestureDetector(
+        child: GestureDetector(
           onTap: () => onMarkerTap?.call(idx),
           child: Icon(
             Icons.location_on,
@@ -41,6 +40,13 @@ class TourMapWidget extends StatelessWidget {
       );
     }).toList();
 
+    final initialPoint = selectedIndex != null
+        ? LatLng(
+            puntos[selectedIndex!].latitud,
+            puntos[selectedIndex!].longitud,
+          )
+        : LatLng(puntos[0].latitud, puntos[0].longitud);
+
     return Container(
       height: height,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -48,7 +54,7 @@ class TourMapWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(51), // 0.2 * 255 = 51
+            color: Colors.black.withAlpha(51),
             blurRadius: 8,
             offset: const Offset(0, 6),
           ),
@@ -58,13 +64,9 @@ class TourMapWidget extends StatelessWidget {
       child: FlutterMap(
         mapController: mapController,
         options: MapOptions(
-          center: selectedIndex != null
-              ? LatLng(
-                  puntos[selectedIndex!].latitud,
-                  puntos[selectedIndex!].longitud,
-                )
-              : LatLng(puntos[0].latitud, puntos[0].longitud),
-          zoom: 5,
+          // En 8.x se usa 'initialCenter' y 'initialZoom'
+          initialCenter: initialPoint,
+          initialZoom: 5,
         ),
         children: [
           TileLayer(

@@ -12,6 +12,7 @@ import 'package:asia_travel/ui/widgets/header/custom_header.dart';
 import 'package:asia_travel/ui/widgets/cards/expandable_round_box.dart';
 import 'package:asia_travel/ui/widgets/cards/html_section.dart';
 import 'package:asia_travel/ui/widgets/cards/trip_card_vertical.dart';
+import 'package:asia_travel/ui/widgets/header/footer_widget.dart';
 
 import 'package:asia_travel/ui/routes/app_routes.dart';
 import 'package:asia_travel/ui/screens/home/home_viewmodel.dart';
@@ -40,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadAllData();
+    SliverToBoxAdapter(child: FooterWidget());
   }
 
   // Método para cargar todos los datos simultáneamente
