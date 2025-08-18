@@ -7,7 +7,7 @@ class LogoTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Image.asset('assets/icons/logo.jpg', width: 30, height: 30),
+        Image.asset('assets/icons/LogoNew.png', width: 50, height: 50),
         const SizedBox(width: 16),
         const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,7 +25,7 @@ class LogoTitle extends StatelessWidget {
               'Travel',
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.white,
+                color: Color.fromRGBO(255, 255, 255, 1),
                 fontStyle: FontStyle.italic,
               ),
             ),

@@ -221,7 +221,7 @@ class _DestinoScreenState extends State<DestinoScreen>
             price: '${tour.precio.toStringAsFixed(0)}€',
             durationLabel: 'Duración:',
             priceLabel: 'Precio:',
-            spacing: 150,
+            spacing: 140,
             onTap: () {
               developer.log(
                 'Navegando a detalle del tour: ${tour.titulo} con id ${tour.id}',
@@ -248,7 +248,7 @@ class _DestinoScreenState extends State<DestinoScreen>
     return SliverToBoxAdapter(
       child: Container(
         width: double.infinity,
-        color: Colors.grey[200],
+        color: Colors.grey[300],
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -145,7 +145,7 @@ class ReservaWidget extends StatelessWidget {
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white,
                     onPressed: () {
-                      print("Presupuesto solicitado");
+                      // print("Presupuesto solicitado");
                     },
                   ),
                 ),
@@ -160,7 +160,7 @@ class ReservaWidget extends StatelessWidget {
                     backgroundColor: Colors.red.shade200,
                     foregroundColor: Colors.white,
                     onPressed: () {
-                      print("Descargando itinerario en PDF");
+                      // print("Descargando itinerario en PDF");
                     },
                   ),
                 ),

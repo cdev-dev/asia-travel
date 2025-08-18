@@ -53,7 +53,7 @@ class ViajeAMedidaWidget extends StatelessWidget {
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
                         onPressed: () {
-                          print("Botón viajes a medida pulsado");
+                          // print("Botón viajes a medida pulsado");
                           // Aquí puedes añadir la acción que quieras
                         },
                       ),

@@ -11,7 +11,7 @@ class FooterWidget extends StatelessWidget {
     const socialIconBg = Color(0xFFE0E0E0);
 
     return Container(
-      color: Colors.white,
+      color: Colors.grey[400],
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

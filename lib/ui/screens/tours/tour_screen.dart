@@ -243,7 +243,7 @@ class _TourScreenState extends State<TourScreen>
     return SliverToBoxAdapter(
       child: Container(
         width: double.infinity,
-        color: Colors.grey[200],
+        color: Colors.grey[300],
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
